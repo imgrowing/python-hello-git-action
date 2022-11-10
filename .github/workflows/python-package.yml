@@ -10,14 +10,23 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  hello:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Echo Environment
+      env:
+        TEST_SECRET: ${{ secrets.TEST_SECRET_KEY }}
+      run: |
+        env
+        echo secrets value: ${{ secrets.TEST_SECRET_KEY }}
 
+  build:
+    needs: hello
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         python-version: ["3.8", "3.9", "3.10"]
-
     steps:
     - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
@@ -25,10 +34,5 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Run Python
-      env:
-        TEST_SECRET: ${{ secrets.TEST_SECRET_KEY }}
       run: |
-        env
-        echo "===="
-        echo secrets value: ${{ secrets.TEST_SECRET_KEY }}
         python3 hello.py
